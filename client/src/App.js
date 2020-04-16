@@ -177,16 +177,6 @@ function App() {
   // TODO: Add Styling
   function showUsersToCall() {
     return (
-      // <Row>
-      //   {Object.keys(users).map((key) => {
-      //     // You dont want to call yourself for heaven sake.
-      //     if (key === yourID) {
-      //       return null;
-      //     }
-      //     const userName = users[key].name;
-      //     return <Button handleClick={() => callPeer(key, stream)}>Call {userName}</Button>;
-      //   })}
-      // </Row>
       <UserList 
         users={users}
         yourID={yourID}
@@ -203,6 +193,12 @@ function App() {
 
   let PartnerVideo;
   if (callAccepted) {
+    // Check if the caller is still connected. Everytime a user leaves users state is updated.
+    if (caller && !users[caller.id]) {
+      console.log('Disconnection');
+      // Todo: This doesn't work.
+      PartnerVideo = null;
+    }
     PartnerVideo = 
     (
       <VideoWrapper>
