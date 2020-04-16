@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './App.css';
+import './App.scss';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import styled from 'styled-components';
 import Button from './components/Button';
+import UserList from './components/UserList';
 
 const Container = styled.div`
   height: 100vh;
@@ -176,16 +177,22 @@ function App() {
   // TODO: Add Styling
   function showUsersToCall() {
     return (
-      <Row>
-        {Object.keys(users).map((key) => {
-          // You dont want to call yourself for heaven sake.
-          if (key === yourID) {
-            return null;
-          }
-          const userName = users[key].name;
-          return <Button handleClick={() => callPeer(key, stream)}>Call {userName}</Button>;
-        })}
-      </Row>
+      // <Row>
+      //   {Object.keys(users).map((key) => {
+      //     // You dont want to call yourself for heaven sake.
+      //     if (key === yourID) {
+      //       return null;
+      //     }
+      //     const userName = users[key].name;
+      //     return <Button handleClick={() => callPeer(key, stream)}>Call {userName}</Button>;
+      //   })}
+      // </Row>
+      <UserList 
+        users={users}
+        yourID={yourID}
+        handleClick={callPeer}
+        yourStream={stream}
+      />
     );
   }
 
