@@ -37,9 +37,13 @@ io.on('connection', (socket) => {
     console.log(`${data.from}  is tryin to call ${data.userIdToCall}`);
     io.to(data.userIdToCall).emit('hey', { signal: data.signalData, from: data.from, name: data.name });
   });
-
+  
+  // This is sent from the user the hey event was sent to.
   socket.on('acceptCall', (data) => {
-    io.to(data.to).emit('callAccepted', data.signal);
+    io.to(data.to).emit('callAccepted', {
+      signal: data.signal,
+      from: data.from
+    });
   });
 });
 

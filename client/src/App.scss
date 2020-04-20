@@ -163,3 +163,10 @@ li:before{
    background-size: cover;
    background-position: center;
 }
+
+
+.host-video-wrapper {
+  &.connected {
+    width: 30% !important;
+  }
+}

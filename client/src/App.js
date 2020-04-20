@@ -37,9 +37,14 @@ const Video = styled.video`
   background-size: cover;
 `;
 
-function App() {
-  // Our ID.
+function App({history}) {
+  
   const name = localStorage.getItem("name") || sessionStorage.getItem("name");
+  if (!name) {
+      history.push("/");
+  }
+
+  // Our ID.
   const [ yourID, setYourID ] = useState('');
 
   // List of all the users retreived from the backend.
@@ -51,9 +56,10 @@ function App() {
   // Call Received from some other user.
   const [ receivingCall, setReceivingCall ] = useState(false);
 
-  //
+  // Related to Call Accepting.
   const [ caller, setCaller ] = useState({});
   const [ callerSignal, setCallerSignal ] = useState();
+  const [partner, setPartner] = useState(null);
 
   // Flag to decide whether to accept the call.
   const [ callAccepted, setCallAccepted ] = useState(false);
@@ -89,7 +95,7 @@ function App() {
       setUsers(users);
     });
 
-    /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept.
+    /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept. You are not the initiator.
       TODO: Refactor "hey" to a better name
     */
 
@@ -102,6 +108,7 @@ function App() {
         name: data.name
       });
       setCallerSignal(data.signal);
+      setPartner(data.from);
     });
   }, []);
 
@@ -138,9 +145,14 @@ function App() {
       }
     });
 
-    socket.current.on('callAccepted', (partnerSignal) => {
-      // Connection finally established. This is the CRUX.
-      peer.signal(partnerSignal);
+    socket.current.on('callAccepted', (data) => {
+      /*
+        Connection finally established. You are the initiator and the person you wanted to
+        talk with has accepted your request and sent his signal you need to do the handshake.
+      */
+     console.log('Call Accepted data is', data);
+      peer.signal(data.signal);
+      setPartner(data.from);
       setCallAccepted(true);
     });
   }
@@ -158,7 +170,8 @@ function App() {
     peer.on('signal', (data) => {
       socket.current.emit('acceptCall', {
         signal: data,
-        to: caller.id
+        to: caller.id,
+        from: yourID
       });
     });
 
@@ -191,22 +204,6 @@ function App() {
     UserVideo = <Video playsInline muted ref={userVideo} autoPlay />;
   }
 
-  let PartnerVideo;
-  if (callAccepted) {
-    // Check if the caller is still connected. Everytime a user leaves users state is updated.
-    if (caller && !users[caller.id]) {
-      console.log('Disconnection');
-      // Todo: This doesn't work.
-      PartnerVideo = null;
-    }
-    PartnerVideo = 
-    (
-      <VideoWrapper>
-        <Video playsInline ref={partnerVideo} autoPlay />
-      </VideoWrapper>
-    );
-  }
-
   let incomingCall;
 
   // TODO: Move it to a separate component.
@@ -224,16 +221,43 @@ function App() {
       </div>
     );
   }
+
+  /* 
+  Time to Render everything. We have a few things to decide.
+  1) Show Partner Video flag
+  2) Partner Disconnected State. Go back to the state where we show only the host video.
+  */
+  // showPartner video flag.
+  const showPartnerVideo = callAccepted && partner && users[partner]; 
   return (
     <Container>
       <Row>
-        <VideoWrapper>
-          {UserVideo}
-        </VideoWrapper>
-        {PartnerVideo}
+        {/* Different styling when host video is*/}
+        { (
+          <VideoWrapper className =
+            {`
+              host-video-wrapper
+              ${showPartnerVideo ? 'connected': '' }
+            `}>
+            {UserVideo}
+          </VideoWrapper>
+        )}
+        
+
+        {showPartnerVideo && (
+          <VideoWrapper>
+            <Video playsInline ref={partnerVideo} autoPlay />
+          </VideoWrapper>
+        )}
+
+        { callAccepted && partner && !users[partner] && (
+          <h2>User Disconnected...</h2>
+        )}
       </Row>
+
       {showUsersToCall()}
       <Row>{incomingCall}</Row>
+
     </Container>
   );
 }

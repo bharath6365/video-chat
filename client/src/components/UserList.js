@@ -1,17 +1,18 @@
 import React from 'react'
+import styled from 'styled-components';
 import Button from './Button';
 
 export default function UserList({users, yourID, handleClick, yourStream}) {
   return (
     <section className="user-list">
       <h1 className="align-center">Users online</h1>
-        <ul>
+        <StyledList>
         {Object.keys(users).map((key) => {
+          const userName = users[key].name;
           // You dont want to call yourself for heaven sake.
-          if (key === yourID) {
+          if (key === yourID || userName === null) {
             return null;
           }
-          const userName = users[key].name;
           // return <Button handleClick={() => handleClick(key, yourStream)}>Call {userName}</Button>;
           return (
             <li>
@@ -20,7 +21,12 @@ export default function UserList({users, yourID, handleClick, yourStream}) {
             </li>
           )
         })}
-        </ul>
+        </StyledList>
     </section>
   )
 }
+
+const StyledList = styled.ul`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+`;

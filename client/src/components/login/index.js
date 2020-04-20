@@ -2,7 +2,12 @@ import React, {useState, useRef} from 'react'
 /*
   We might prompt the user to enter the name everytime he enters the app or he can decide to persist the name for subsequent logins. 
 */
-export default function GetName() {
+export default function GetName({history}) {
+
+  // First things first. If name is present do not show the screen.
+  if (localStorage.getItem("name") || sessionStorage.getItem("name")) {
+    history.push("/chat");
+  }
   const checkboxRef = useRef();
   // Name change.
   const handleChange = (e) => {
@@ -19,13 +24,7 @@ export default function GetName() {
     } else {
       sessionStorage.setItem("name", name);
     }
-    redirect();
-  }
-
-  // Redirect to chat route.
-  // TODO: Don't let the page reload.
-  const redirect = () => {
-    window.location.href = "/chat";
+    history.push("/chat");
   }
 
   const [name, setName] = useState('');
