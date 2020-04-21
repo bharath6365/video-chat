@@ -1,3 +1,4 @@
+
 .name-form-container {
   height: 100vh;
   background: linear-gradient(
@@ -92,6 +93,7 @@ fieldset {
   /* No Modal No Problem. :P */
   box-shadow: 1px 3px 0 1000px rgba(0,0,0,0.5);
   padding: 20px;
+  z-index: 1000;
 }
 
 /* Button styles */
@@ -121,7 +123,6 @@ button.secondary {
 }
 
 section {
-  margin: 50px 0;
   padding: 50px 25px;
 }
 
@@ -164,9 +165,34 @@ li:before{
    background-position: center;
 }
 
+.video-section-wrapper {
+  position: relative;
+  background: black;
+}
 
 .host-video-wrapper {
+  transition: clip-path .5s ease;
+  z-index: 250;
+  margin: auto;
   &.connected {
-    width: 30% !important;
+    width: 200px!important;
+    height: 200px !important;
+    background-size: cover !important;
+    background-position: center;
+    position: absolute;
+    bottom: 30px;
+    right: 15vw;
+    
+    video {
+      border-radius: 50%;
+    }
   }
+}
+
+.partner-video-wrapper {
+  width: 70vw !important;
+  height: 600px !important;
+  margin: 0 auto;
+  z-index: 200;
+  background: none;
 }

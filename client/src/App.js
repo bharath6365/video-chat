@@ -19,7 +19,6 @@ const Row = styled.div`
 `;
 
 const VideoWrapper = styled.div`
-  border: 1px solid blue;
   width: 50%;
   height: 400px;
   position: relative;
@@ -29,12 +28,9 @@ const Video = styled.video`
   position: absolute;
   right: 0; 
   bottom: 0;
-  min-width: 100%; 
-  min-height: 100%;
-  width: auto; 
-  height: auto; 
-  z-index: -100;
-  background-size: cover;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 `;
 
 function App({history}) {
@@ -228,32 +224,39 @@ function App({history}) {
   2) Partner Disconnected State. Go back to the state where we show only the host video.
   */
   // showPartner video flag.
-  const showPartnerVideo = callAccepted && partner && users[partner]; 
+  const showPartnerVideo = callAccepted && partner && users[partner];
+
+  const partnerDisconnected = callAccepted && partner && !users[partner];
+  if (partnerDisconnected) {
+    // Todo: Find a better way. Host Stream freezes.
+    window.location.reload();
+  }
   return (
     <Container>
-      <Row>
-        {/* Different styling when host video is*/}
-        { (
-          <VideoWrapper className =
-            {`
-              host-video-wrapper
-              ${showPartnerVideo ? 'connected': '' }
-            `}>
-            {UserVideo}
-          </VideoWrapper>
-        )}
-        
+      <Row className="video-section-wrapper">
+          {/* Different styling when host video is*/}
+          { (
+            <VideoWrapper className =
+              {`
+                host-video-wrapper
+                ${showPartnerVideo ? 'connected': '' }
+              `}>
+              {UserVideo}
+            </VideoWrapper>
+          )}
+          
 
-        {showPartnerVideo && (
-          <VideoWrapper>
-            <Video playsInline ref={partnerVideo} autoPlay />
-          </VideoWrapper>
-        )}
+          {showPartnerVideo && (
+            <VideoWrapper className="partner-video-wrapper">
+              <Video playsInline ref={partnerVideo} autoPlay />
+            </VideoWrapper>
+          )}
+        </Row>
 
-        { callAccepted && partner && !users[partner] && (
+        { partnerDisconnected && (
           <h2>User Disconnected...</h2>
         )}
-      </Row>
+      
 
       {showUsersToCall()}
       <Row>{incomingCall}</Row>
