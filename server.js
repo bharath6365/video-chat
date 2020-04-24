@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
   // Broadcast to all users that a new user has joined.
   io.sockets.emit('allUsers', users);
 
-  // Socket disconnection.
+  // Socket disconnection. Not to be confused with call disconnection.
   socket.on('disconnect', () => {
     delete users[socket.id];
 
@@ -34,7 +34,6 @@ io.on('connection', (socket) => {
 
   // Request from the client to pass on this signal request to another user in the data.
   socket.on('callUser', (data) => {
-    console.log(`${data.from}  is tryin to call ${data.userIdToCall}`);
     io.to(data.userIdToCall).emit('hey', { signal: data.signalData, from: data.from, name: data.name });
   });
   
@@ -45,6 +44,18 @@ io.on('connection', (socket) => {
       from: data.from
     });
   });
+
+  socket.on('disconnectCall', (data) => {
+    /*
+      Data will be in the format
+        {
+          id: socketid,
+          name: 'xyz'
+        }
+    */ 
+    console.log('Disconnect call ran', data);
+    io.to(data.id).emit('partnerDisconnected', data);
+  })
 });
 
 server.listen(8000, () => console.log('server is running on port 8000'));

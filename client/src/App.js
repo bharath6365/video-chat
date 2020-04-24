@@ -5,6 +5,7 @@ import Peer from 'simple-peer';
 import styled from 'styled-components';
 import Button from './components/Button';
 import UserList from './components/UserList';
+import CallCut from './images/call-cut.png';
 
 const Container = styled.div`
   height: 100vh;
@@ -55,10 +56,15 @@ function App({history}) {
   // Related to Call Accepting.
   const [ caller, setCaller ] = useState({});
   const [ callerSignal, setCallerSignal ] = useState();
+  
+  // Aren't caller and partner same?
   const [partner, setPartner] = useState(null);
 
   // Flag to decide whether to accept the call.
   const [ callAccepted, setCallAccepted ] = useState(false);
+
+  // Peer object later used to close calls.
+  const [peer, setPeer] = useState(null);
 
   const userVideo = useRef();
   const partnerVideo = useRef();
@@ -91,6 +97,11 @@ function App({history}) {
       setUsers(users);
     });
 
+    // When someone else rejects/disconnects your call.
+    socket.current.on('partnerDisconnected', (data) => {
+      setPartner(null);
+    })
+
     /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept. You are not the initiator.
       TODO: Refactor "hey" to a better name
     */
@@ -120,6 +131,8 @@ function App({history}) {
       trickle: false,
       stream: stream
     });
+
+    setPeer(peer);
 
     // This is the handshake that the other peer needs to accept.
     // We are also passing on stream data which the other peer must accept.
@@ -163,6 +176,8 @@ function App({history}) {
       stream: stream
     });
 
+    setPeer(peer);
+
     peer.on('signal', (data) => {
       socket.current.emit('acceptCall', {
         signal: data,
@@ -174,12 +189,24 @@ function App({history}) {
     peer.on('stream', (stream) => {
       partnerVideo.current.srcObject = stream;
     });
+     
+    // Add a disconnect method.
 
     peer.signal(callerSignal);
   }
+  
 
+  // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
+  }
+  
+  // Triggered only when user manually clicks on disconnect call button.
+  function disconnectCall() {
+    // Send an event to the server that user disconected.
+    socket.current.emit('disconnectCall', caller);
+    peer.destroy();
+    setPartner(null);
   }
 
   // Returns a list of people that we can call.
@@ -248,7 +275,8 @@ function App({history}) {
 
           {showPartnerVideo && (
             <VideoWrapper className="partner-video-wrapper">
-              <Video playsInline ref={partnerVideo} autoPlay />
+                <Video playsInline ref={partnerVideo} autoPlay />
+                <img onClick={() => disconnectCall()} className="call-cut" src={CallCut} />
             </VideoWrapper>
           )}
         </Row>
