@@ -81,21 +81,6 @@ fieldset {
   background: white;
 }
 
-/* App Screen */
-
-.incoming-call-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 5px;
-  /* No Modal No Problem. :P */
-  box-shadow: 1px 3px 0 1000px rgba(0,0,0,0.5);
-  padding: 20px;
-  z-index: 1000;
-}
-
 /* Button styles */
 button {
   padding: 10px 25px;
@@ -133,13 +118,10 @@ section {
 /*
   User List Related
 */
-.user-list {
-  background: linear-gradient(to right, #ff4b1f, #ff9068);
-  clip-path: polygon(0 6%, 100% 0, 100% 94%, 0% 100%);
-}
 
 .user-list h1{
-  color: #fff;
+  color: black;
+  margin-bottom: 40px;
   font-size: 2.5rem;
 }
 
