@@ -69,6 +69,7 @@ function App({ history }) {
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
+  const ringAudio = useRef();
 
   useEffect(() => {
     // In Development. This is forwarded to the backend by create react app.
@@ -116,6 +117,9 @@ function App({ history }) {
       });
       setCallerSignal(data.signal);
       setPartner(data.from);
+
+      // Ringtone
+      ringAudio.current.play();
     });
   }, []);
 
@@ -190,6 +194,9 @@ function App({ history }) {
       partnerVideo.current.srcObject = stream;
     });
 
+    ringAudio.current.pause();
+    ringAudio.current.currentTime = 0;
+
     // Add a disconnect method.
 
     peer.signal(callerSignal);
@@ -198,6 +205,8 @@ function App({ history }) {
   // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
+    ringAudio.current.pause();
+    ringAudio.current.currentTime = 0;
   }
 
   // Triggered only when user manually clicks on disconnect call button.
@@ -289,6 +298,12 @@ function App({ history }) {
 
       {showUsersToCall()}
       <Row>{incomingCall}</Row>
+
+
+      <audio ref={ringAudio} loop>
+        <source src="/audio/dialtone.mp3">
+        </source>
+      </audio>
     </Container>
   );
 }
