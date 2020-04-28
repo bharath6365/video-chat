@@ -167,6 +167,15 @@ function App({ history }) {
       peer.signal(data.signal);
       setPartner(data.from);
       setCallAccepted(true);
+
+      // Signal to the Server to update the User List.
+      socket.current.emit('updateUsers', {
+        available: false,
+        users: {
+          [data.from]: true,
+          [yourID]: true
+        }     
+      })
     });
   }
 
@@ -213,6 +222,15 @@ function App({ history }) {
   function disconnectCall() {
     // Send an event to the server that user disconected.
     socket.current.emit('disconnectCall', caller);
+    // Update the list of users. Mark them as available.
+    // Signal to the Server to update the User List.
+      socket.current.emit('updateUsers', {
+        available: true,
+        users: {
+          [partner]: true,
+          [yourID]: true
+        }     
+      })
     peer.destroy();
     setPartner(null);
   }

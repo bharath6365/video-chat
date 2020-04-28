@@ -9,6 +9,7 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
         {Object.keys(users).map((key) => {
           const random = Math.random() * (100 - 0);
           const userName = users[key].name;
+          const available = users[key].available;
           // You dont want to call yourself for heaven sake.
           if (key === yourID || userName === null) {
             return null;
@@ -18,11 +19,11 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
               <Card.Content>
                 <Image floated="right" size="mini" src="https://react.semantic-ui.com/images/avatar/large/steve.jpg" />
                 <Card.Header>{userName}</Card.Header>
-                <Card.Meta>Available.</Card.Meta>
+                <Card.Meta>{available ? 'Available': 'Busy'}</Card.Meta>
               </Card.Content>
               <Card.Content extra>
                 <div className="ui two buttons">
-                  <Button onClick={() => handleClick(key, yourStream)} basic color="green">
+                  <Button disabled={available ? false : true} onClick={() => handleClick(key, yourStream)} basic color="green">
                     Call
                   </Button>
                 </div>

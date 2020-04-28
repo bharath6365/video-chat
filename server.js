@@ -15,7 +15,8 @@ io.on('connection', (socket) => {
   if (!users[socket.id]) {
     users[socket.id] = {
       id: socket.id,
-      name: userName
+      name: userName,
+      available: true
     };
   }
   // Send ID to the client for him to differentiate with other users.
@@ -53,8 +54,26 @@ io.on('connection', (socket) => {
           name: 'xyz'
         }
     */ 
-    console.log('Disconnect call ran', data);
     io.to(data.id).emit('partnerDisconnected', data);
+  })
+
+  socket.on('updateUsers', (data) => {
+    /*
+      Data will be sent in the format.
+        {
+          available: true,
+          users: {
+            e211e11: true,
+            wffqfwq: true
+          }
+        }
+    */
+    for (let socketID in data.users) {
+      users[socketID].available = data.available;
+    }
+    
+    // TODO: Refactor into  a separate function.
+    io.sockets.emit('allUsers', users);
   })
 });
 
