@@ -5,7 +5,7 @@ import React, {useState, useRef} from 'react'
 export default function GetName({history}) {
 
   // First things first. If name is present do not show the screen.
-  if (localStorage.getItem("name") || sessionStorage.getItem("name")) {
+  if (localStorage.getItem("name")) {
     history.push("/chat");
   }
   const checkboxRef = useRef();
@@ -21,8 +21,6 @@ export default function GetName({history}) {
 
     if (isChecked) {
       localStorage.setItem("name", name);
-    } else {
-      sessionStorage.setItem("name", name);
     }
     history.push("/chat");
   }
