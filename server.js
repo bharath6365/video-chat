@@ -46,6 +46,12 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Reject Call
+  socket.on('rejectCall', (data) => {
+    // Send an event to the person who initiate the call.    
+    io.to(data.id).emit('rejectCallAcknowledgement', data);
+  })
+
   socket.on('disconnectCall', (data) => {
     /*
       Data will be in the format

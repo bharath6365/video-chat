@@ -189,4 +189,10 @@ li:before{
   transform: translateX(-50%);
   height: 50px;
   cursor: pointer;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+    transform: translateX(-50%) rotateZ(120deg);
+  }
 }

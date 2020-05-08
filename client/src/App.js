@@ -4,9 +4,13 @@ import './App.scss';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import styled from 'styled-components';
+import { useSnackbar } from 'react-simple-snackbar'
+
+import {snackBarOptions} from './utils';
 import MyButton from './components/Button';
 import UserList from './components/UserList';
 import CallCut from './images/call-cut.png';
+
 
 const Container = styled.div`
   height: 100vh;
@@ -66,6 +70,8 @@ function App({ history }) {
   // Peer object later used to close calls.
   const [ peer, setPeer ] = useState(null);
 
+  const [openSnackbar, closeSnackbar] = useSnackbar(snackBarOptions);
+
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
@@ -102,6 +108,12 @@ function App({ history }) {
     socket.current.on('partnerDisconnected', (data) => {
       setPartner(null);
     });
+
+    // Partner rejected your call.
+    socket.current.on('rejectCallAcknowledgement', (data) => {
+      console.log('Reject call data is', data);
+      openSnackbar(`${data.name} rejected your call`);
+    })
 
     /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept. You are not the initiator.
       TODO: Refactor "hey" to a better name
@@ -214,6 +226,8 @@ function App({ history }) {
   // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
+    socket.current.emit('rejectCall', caller);
+    // Reset Call Audio.
     ringAudio.current.pause();
     ringAudio.current.currentTime = 0;
   }

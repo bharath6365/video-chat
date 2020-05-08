@@ -31,7 +31,9 @@ export default function Navigation({history}) {
 
 
 const StyledNav = styled.nav`
-  max-width: 80vw;
+  background: black;
+  color: #fff;
+  padding: 10px 10vw;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
