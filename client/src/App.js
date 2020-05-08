@@ -231,7 +231,7 @@ function App({ history }) {
           [yourID]: true
         }     
       })
-    peer.destroy();
+    //peer.destroy();
     setPartner(null);
   }
 
@@ -286,7 +286,7 @@ function App({ history }) {
 
   const partnerDisconnected = callAccepted && partner && !users[partner];
   if (partnerDisconnected) {
-    // Todo: Find a better way. Host Stream freezes.
+    // TODO: Find a better way. Host Stream freezes.
     window.location.reload();
   }
   return (
