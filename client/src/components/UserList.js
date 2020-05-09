@@ -14,16 +14,19 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
           if (key === yourID || userName === null) {
             return null;
           }
+
+          // There are 12 random avatar's available. On Every render assign a random avatar.
+          const avatarID = Math.floor(Math.random() * (9 - 1) + 1);
           return (
             <Card>
               <Card.Content>
-                <Image floated="right" size="mini" src="https://react.semantic-ui.com/images/avatar/large/steve.jpg" />
+                <Image floated="right" size="mini" src={`https://randomuser.me/api/portraits/lego/${avatarID}.jpg`} />
                 <Card.Header>{userName}</Card.Header>
                 <Card.Meta>{available ? 'Available': 'Busy'}</Card.Meta>
               </Card.Content>
               <Card.Content extra>
                 <div className="ui two buttons">
-                  <Button disabled={available ? false : true} onClick={() => handleClick(key, yourStream)} basic color="green">
+                  <Button disabled={available ? false : true} onClick={() => handleClick(key, yourStream)} color="green">
                     Call
                   </Button>
                 </div>
