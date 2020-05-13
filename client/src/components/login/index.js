@@ -21,6 +21,10 @@ export default function GetName({history}) {
 
     if (isChecked) {
       localStorage.setItem("name", name);
+
+      const avatarNumber = Math.floor(Math.random() * (9 - 1) + 1);
+
+      localStorage.setItem("avatarNumber", avatarNumber);
     }
     history.push("/chat");
   }

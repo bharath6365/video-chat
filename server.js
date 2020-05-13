@@ -11,12 +11,15 @@ const users = {};
 
 io.on('connection', (socket) => {
   const userName = socket.handshake.query['userName'];
+  const avatarNumber = socket.handshake.query['avatarNumber'];
+  console.log('Avatar number is', avatarNumber);
   // Every socket gets a unique ID. Use that as a hack to differentiate between users.
   if (!users[socket.id]) {
     users[socket.id] = {
       id: socket.id,
       name: userName,
-      available: true
+      available: true,
+      avatarNumber
     };
   }
   // Send ID to the client for him to differentiate with other users.

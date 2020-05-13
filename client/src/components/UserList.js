@@ -16,7 +16,7 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
           }
 
           // There are 12 random avatar's available. On Every render assign a random avatar.
-          const avatarID = Math.floor(Math.random() * (9 - 1) + 1);
+          const avatarID = users[key].avatarNumber;
           return (
             <Card>
               <Card.Content>

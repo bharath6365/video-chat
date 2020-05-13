@@ -40,7 +40,8 @@ const Video = styled.video`
 `;
 
 function App({ history }) {
-  const name = localStorage.getItem('name') || sessionStorage.getItem('name');
+  const name = localStorage.getItem('name');
+  const avatarNumber = localStorage.getItem('avatarNumber');
   if (!name) {
     history.push('/');
   }
@@ -81,7 +82,7 @@ function App({ history }) {
     // In Development. This is forwarded to the backend by create react app.
 
     //When setting up the initial connection pass on the user name.
-    socket.current = io.connect('/', { query: `userName=${name}` });
+    socket.current = io.connect('/', { query: `userName=${name}&avatarNumber=${avatarNumber}` });
 
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -141,6 +142,7 @@ function App({ history }) {
     we are interested in talking to them. We do that by creating a peer (WebRTC) and then
     we pass it on to the other client through the socket (Server). The other client needs to accept our call and then he will send a signal over to you. When you call peer.signal(signal) and the other person calls peer.signal() you both are connected.
     */
+    
     const peer = new Peer({
       // I'm initiating the call
       initiator: true,
@@ -202,7 +204,8 @@ function App({ history }) {
     });
 
     setPeer(peer);
-
+    
+    // When you start generating a stream.
     peer.on('signal', (data) => {
       socket.current.emit('acceptCall', {
         signal: data,
@@ -248,8 +251,18 @@ function App({ history }) {
           [yourID]: true
         }     
       })
-    //peer.destroy();
+    peer.destroy();
     setPartner(null);
+    // window.location.reload();
+    
+    // We somehow need to reset the peer here.
+
+    // setPeer(new Peer({
+    //   // I'm initiating the call
+    //   initiator: true,
+    //   trickle: false,
+    //   stream: stream
+    // }));
   }
 
   // Returns a list of people that we can call.

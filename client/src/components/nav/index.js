@@ -5,6 +5,7 @@ import Logo from '../../images/one-chat-logo.png';
 
 const handleLogoutClick = (history) => {
   localStorage.removeItem('name');
+  localStorage.removeItem('avatarNumber');
   window.location.pathname = '/';
 }
 
