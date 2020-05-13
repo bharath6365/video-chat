@@ -226,7 +226,10 @@ function App({ history }) {
   // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
-    socket.current.emit('rejectCall', caller);
+    socket.current.emit('rejectCall', {
+      id: caller.id,
+      name
+    });
     // Reset Call Audio.
     ringAudio.current.pause();
     ringAudio.current.currentTime = 0;
