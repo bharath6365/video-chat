@@ -28,6 +28,10 @@ const VideoWrapper = styled.div`
   width: 50%;
   height: 400px;
   position: relative;
+
+  @media(max-width: 960px) {
+    width: 100%;
+  }
 `;
 
 const Video = styled.video`

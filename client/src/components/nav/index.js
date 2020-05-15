@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {Link} from 'react-router-dom';
 import styled from 'styled-components';
-import Logo from '../../images/one-chat-logo.png';
 
 const handleLogoutClick = (history) => {
   localStorage.removeItem('name');
@@ -18,8 +17,8 @@ export default function Navigation({history}) {
 
   return (
     <StyledNav>
-      <img src={Logo} alt="Company Logo" />
       
+      <h2>OneChat</h2>
       
       {
         loggedIn && (
@@ -39,6 +38,11 @@ const StyledNav = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  h2 {
+    font-family: 'Kavoon', cursive;
+    font-size: 2rem;
+  }
 
   img {
     height: 75px;

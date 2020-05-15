@@ -157,9 +157,9 @@ li:before{
   z-index: 250;
   margin: auto;
   &.connected {
-    width: 200px!important;
-    height: 200px !important;
-    background-size: cover !important;
+    width: 200px;
+    height: 200px;
+    background-size: cover;
     background-position: center;
     position: absolute;
     bottom: 30px;
@@ -171,13 +171,16 @@ li:before{
   }
 }
 
-.partner-video-wrapper {
-  width: 70vw !important;
-  height: 600px !important;
-  margin: 0 auto;
-  z-index: 200;
-  background: none;
+.video-section-wrapper {
+  .partner-video-wrapper {
+    width: 70vw;
+    height: 600px;
+    margin: 0 auto;
+    z-index: 200;
+    background: none;
+  }
 }
+
 
 /* Call cute behaviour*/
 .call-cut {
@@ -194,5 +197,21 @@ li:before{
   &:hover {
     opacity: 1;
     transform: translateX(-50%) rotateZ(120deg);
+  }
+}
+
+@media(max-width: 960px) {
+  .video-section-wrapper {
+    .partner-video-wrapper {
+      width: 100vw;
+      height: 80vh;
+    }
+
+    .host-video-wrapper.connected {
+      width: 100px;
+      height: 100px;
+      bottom: 10px;
+      right: 10px;
+    }
   }
 }
