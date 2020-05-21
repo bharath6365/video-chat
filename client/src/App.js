@@ -86,7 +86,7 @@ function App({ history }) {
     // In Development. This is forwarded to the backend by create react app.
 
     //When setting up the initial connection pass on the user name.
-    socket.current = io.connect('/', { query: `userName=${name}&avatarNumber=${avatarNumber}` });
+    socket.current = io.connect('https://onechat-backend.herokuapp.com/', { query: `userName=${name}&avatarNumber=${avatarNumber}` });
 
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })

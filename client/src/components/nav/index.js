@@ -13,7 +13,6 @@ export default function Navigation({history}) {
  
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('name') ? true : false);
 
-  console.log(loggedIn, history);
 
   return (
     <StyledNav>
