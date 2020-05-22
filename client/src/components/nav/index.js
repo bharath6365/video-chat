@@ -8,14 +8,14 @@ const handleLogoutClick = (history) => {
   window.location.pathname = '/';
 }
 
-export default function Navigation({history}) {
-
- 
+export default function Navigation() {
+  
+  const isHomePage = window.location.pathname === '/';
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('name') ? true : false);
 
 
   return (
-    <StyledNav>
+    <StyledNav className={isHomePage ? "sticky" : ""}>
       
       <h2>OneChat</h2>
       
@@ -51,5 +51,13 @@ const StyledNav = styled.nav`
     cursor: pointer;
     font-size: 1.25rem;
     margin: 0;
+  }
+
+  &.sticky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    width: 100%;
   }
 `

@@ -215,3 +215,27 @@ li:before{
     }
   }
 }
+
+@media(max-width: 600px) {
+  .name-form-container input[type="text"] {
+    width: 100%;
+    font-size: 1.45rem;
+  }
+
+  .checkbox-fieldset {
+    label {
+      font-size: 0.75rem;
+    }
+
+    input[type="checkbox"], span {
+      width: 50px;
+      height: 25px;
+    }
+
+    span::before {
+      width: 15px;
+      height: 15px;
+      left: 5px;
+    }
+  }
+}

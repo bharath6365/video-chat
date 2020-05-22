@@ -18,13 +18,15 @@ export default function GetName({history}) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const isChecked = checkboxRef.current.checked;
+    
+    // Set Avatar for user. Currently it will be persisted irrespective of checkbox.
+    const avatarNumber = Math.floor(Math.random() * (9 - 1) + 1);
+    localStorage.setItem("avatarNumber", avatarNumber);
 
     if (isChecked) {
       localStorage.setItem("name", name);
-
-      const avatarNumber = Math.floor(Math.random() * (9 - 1) + 1);
-
-      localStorage.setItem("avatarNumber", avatarNumber);
+    } else {
+      sessionStorage.setItem("name", name);
     }
     history.push("/chat");
   }
@@ -34,7 +36,7 @@ export default function GetName({history}) {
     <div className="name-form-container">
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <input required type="text" autoFocus name="name" placeholder="Enter your name" value={name} 
+          <input required type="text" autoFocus name="name" placeholder="Type your name and press enter" value={name} 
             onChange={handleChange}
           />
         </fieldset>

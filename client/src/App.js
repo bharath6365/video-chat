@@ -44,7 +44,7 @@ const Video = styled.video`
 `;
 
 function App({ history }) {
-  const name = localStorage.getItem('name');
+  const name = localStorage.getItem('name') || sessionStorage.getItem('name');
   const avatarNumber = localStorage.getItem('avatarNumber');
   if (!name) {
     history.push('/');
