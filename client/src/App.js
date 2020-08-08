@@ -4,13 +4,12 @@ import './App.scss';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import styled from 'styled-components';
-import { useSnackbar } from 'react-simple-snackbar'
+import { useSnackbar } from 'react-simple-snackbar';
 
-import {snackBarOptions} from './utils';
+import { snackBarOptions } from './utils';
 import MyButton from './components/Button';
 import UserList from './components/UserList';
 import CallCut from './images/call-cut.png';
-
 
 const Container = styled.div`
   height: 100vh;
@@ -29,7 +28,7 @@ const VideoWrapper = styled.div`
   height: 400px;
   position: relative;
 
-  @media(max-width: 960px) {
+  @media (max-width: 960px) {
     width: 100%;
   }
 `;
@@ -62,6 +61,9 @@ function App({ history }) {
   // Call Received from some other user.
   const [ receivingCall, setReceivingCall ] = useState(false);
 
+  // Outgoing call Modal.
+  const [ outgoingCall, setOutgoingCall ] = useState(false);
+
   // Related to Call Accepting.
   const [ caller, setCaller ] = useState({});
   const [ callerSignal, setCallerSignal ] = useState();
@@ -75,7 +77,7 @@ function App({ history }) {
   // Peer object later used to close calls.
   const [ peer, setPeer ] = useState(null);
 
-  const [openSnackbar, closeSnackbar] = useSnackbar(snackBarOptions);
+  const [ openSnackbar, closeSnackbar ] = useSnackbar(snackBarOptions);
 
   const userVideo = useRef();
   const partnerVideo = useRef();
@@ -86,7 +88,9 @@ function App({ history }) {
     // In Development. This is forwarded to the backend by create react app.
 
     //When setting up the initial connection pass on the user name.
-    socket.current = io.connect(process.env.SOCKET_URL, { query: `userName=${name}&avatarNumber=${avatarNumber}` });
+    socket.current = io.connect('https://onechat-backend.herokuapp.com/', {
+      query: `userName=${name}&avatarNumber=${avatarNumber}`
+    });
 
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -116,9 +120,9 @@ function App({ history }) {
 
     // Partner rejected your call.
     socket.current.on('rejectCallAcknowledgement', (data) => {
-      console.log('Reject call data is', data);
+      setOutgoingCall(false);
       openSnackbar(`${data.name} rejected your call`);
-    })
+    });
 
     /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept. You are not the initiator.
       TODO: Refactor "hey" to a better name
@@ -141,59 +145,61 @@ function App({ history }) {
   }, []);
 
   function callPeer(peerID, stream) {
-    /* 
+    // Promise because we will have to disabl load button.
+    return new Promise((resolve, reject) => {
+      /* 
     Whenever we want to call a peer first we need to send a signal to someone that
     we are interested in talking to them. We do that by creating a peer (WebRTC) and then
     we pass it on to the other client through the socket (Server). The other client needs to accept our call and then he will send a signal over to you. When you call peer.signal(signal) and the other person calls peer.signal() you both are connected.
     */
-    
-    const peer = new Peer({
-      // I'm initiating the call
-      initiator: true,
-      trickle: false,
-      stream: stream
-    });
 
-    setPeer(peer);
+      const peer = new Peer({
+        // I'm initiating the call
+        initiator: true,
+        trickle: false,
+        stream: stream
+      });
 
-    // This is the handshake that the other peer needs to accept.
-    // We are also passing on stream data which the other peer must accept.
-    peer.on('signal', (data) => {
-      const callData = {
-        userIdToCall: peerID,
-        signalData: data,
-        from: yourID,
-        name
-      };
+      setPeer(peer);
 
-      socket.current.emit('callUser', callData);
-    });
+      // This is the handshake that the other peer needs to accept.
+      // We are also passing on stream data which the other peer must accept.
+      peer.on('signal', (data) => {
+        const callData = {
+          userIdToCall: peerID,
+          signalData: data,
+          from: yourID,
+          name
+        };
 
-    // As soon as we receive a stream from the other user. Set it
-    peer.on('stream', (partnerStream) => {
-      if (partnerVideo.current) {
-        partnerVideo.current.srcObject = partnerStream;
-      }
-    });
+        socket.current.emit('callUser', callData);
+        // Outgoing call modal.
+        setOutgoingCall(true);
 
-    socket.current.on('callAccepted', (data) => {
-      /*
+        // Signal to the Server to update the User List.
+        changeUserAvailability(peerID, yourID, false);
+
+        resolve(true);
+      });
+
+      // As soon as we receive a stream from the other user. Set it
+      peer.on('stream', (partnerStream) => {
+        if (partnerVideo.current) {
+          partnerVideo.current.srcObject = partnerStream;
+        }
+      });
+
+      socket.current.on('callAccepted', (data) => {
+        /*
         Connection finally established. You are the initiator and the person you wanted to
         talk with has accepted your request and sent his signal you need to do the handshake.
       */
-      console.log('Call Accepted data is', data);
-      peer.signal(data.signal);
-      setPartner(data.from);
-      setCallAccepted(true);
-
-      // Signal to the Server to update the User List.
-      socket.current.emit('updateUsers', {
-        available: false,
-        users: {
-          [data.from]: true,
-          [yourID]: true
-        }     
-      })
+        peer.signal(data.signal);
+        setPartner(data.from);
+        // Remove the outgoing Modal
+        setOutgoingCall(false);
+        setCallAccepted(true);
+      });
     });
   }
 
@@ -208,7 +214,7 @@ function App({ history }) {
     });
 
     setPeer(peer);
-    
+
     // When you start generating a stream.
     peer.on('signal', (data) => {
       socket.current.emit('acceptCall', {
@@ -233,6 +239,7 @@ function App({ history }) {
   // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
+    changeUserAvailability(caller.id, yourID, true);
     socket.current.emit('rejectCall', {
       id: caller.id,
       name
@@ -248,25 +255,40 @@ function App({ history }) {
     socket.current.emit('disconnectCall', caller);
     // Update the list of users. Mark them as available.
     // Signal to the Server to update the User List.
-      socket.current.emit('updateUsers', {
-        available: true,
-        users: {
-          [partner]: true,
-          [yourID]: true
-        }     
-      })
+    socket.current.emit('updateUsers', {
+      available: true,
+      users: {
+        [partner]: true,
+        [yourID]: true
+      }
+    });
     peer.destroy();
     setPartner(null);
-    // window.location.reload();
-    
-    // We somehow need to reset the peer here.
+  }
 
-    // setPeer(new Peer({
-    //   // I'm initiating the call
-    //   initiator: true,
-    //   trickle: false,
-    //   stream: stream
-    // }));
+  // Function that changes the availability of users. (Busy/available)
+  function changeUserAvailability(user1, user2, available = true) {
+    socket.current.emit('updateUsers', {
+      available,
+      users: {
+        [user1]: available,
+        [user2]: available
+      }
+    });
+  }
+
+  // Outgoing call modal
+  function showOutgoingCall() {
+    if (!outgoingCall) return null;
+
+    return (
+      <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
+        <Header icon="call" content="Calling the user..." />
+        <Modal.Content>
+          <p>Hang on tight.</p>
+        </Modal.Content>
+      </Modal>
+    );
   }
 
   // Returns a list of people that we can call.
@@ -287,13 +309,7 @@ function App({ history }) {
   if (receivingCall) {
     const header = `${caller.name} is calling you`;
     incomingCall = (
-      <Modal 
-        defaultOpen={true} 
-        closeOnDimmerClick={false} 
-        closeOnDocumentClick={false} 
-        basic 
-        size="small"
-      >
+      <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
         <Header icon="call" content={header} />
         <Modal.Content>
           <p>Would you like to accept the call?</p>
@@ -348,13 +364,12 @@ function App({ history }) {
 
       {partnerDisconnected && <h2>User Disconnected...</h2>}
 
+      {showOutgoingCall()}
       {showUsersToCall()}
       <Row>{incomingCall}</Row>
 
-
       <audio ref={ringAudio} loop>
-        <source src="/audio/dialtone.mp3">
-        </source>
+        <source src="/audio/dialtone.mp3" />
       </audio>
     </Container>
   );

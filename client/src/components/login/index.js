@@ -46,7 +46,7 @@ export default function GetName({history}) {
             Remember your name for subsequent logins?
           </label>
           <div className="checkbox-wrapper">
-            <input ref={checkboxRef} type="checkbox" />
+            <input tabindex="2" ref={checkboxRef} type="checkbox" />
             <span></span>
           </div>
           

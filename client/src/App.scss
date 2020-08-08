@@ -75,7 +75,7 @@ fieldset {
 }
 
 .checkbox-fieldset input:checked + span{
-  background: green;
+  background:#595ac7a1;
 }
 
 .checkbox-fieldset input:checked + span::before{
@@ -227,7 +227,7 @@ li:before{
 
   .checkbox-fieldset {
     label {
-      font-size: 0.75rem;
+      font-size: 0.625rem;
     }
 
     input[type="checkbox"], span {

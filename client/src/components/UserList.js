@@ -1,11 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button, Card, Image } from 'semantic-ui-react';
 
 import NotFound from './NotFound';
 
 export default function UserList({ users, yourID, handleClick, yourStream }) {
+
+  const [buttonLoading, setButtonLoading] = useState(false)
+
+  const handleButtonClick = (key, yourStream) => {
+    setButtonLoading(true);
+
+    handleClick(key, yourStream).finally(() => {
+      setButtonLoading(false);
+    })
+  }
+
   const usersOnline = Object.keys(users).length;
-  console.log('USers online: ' + usersOnline);
   return (
     <section className="user-list">
       <h1 className="align-center">Users online</h1>
@@ -33,8 +43,9 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
                 <Card.Content extra>
                   <div className="ui two buttons">
                     <Button
+                      loading={buttonLoading}
                       disabled={available ? false : true}
-                      onClick={() => handleClick(key, yourStream)}
+                      onClick={() => handleButtonClick(key, yourStream)}
                       color="green"
                     >
                       Call
