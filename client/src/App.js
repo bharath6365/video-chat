@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import { snackBarOptions } from './utils';
-import MyButton from './components/Button';
 import UserList from './components/UserList';
 import CallCut from './images/call-cut.png';
 
@@ -75,7 +74,7 @@ function App({ history }) {
   const [ callAccepted, setCallAccepted ] = useState(false);
 
   // Peer object later used to close calls.
-  const [ peer, setPeer ] = useState(null);
+  let [ peer, setPeer ] = useState(null);
 
   const [ openSnackbar, closeSnackbar ] = useSnackbar(snackBarOptions);
 
@@ -86,9 +85,10 @@ function App({ history }) {
 
   useEffect(() => {
     // In Development. This is forwarded to the backend by create react app.
+    console.log('Socket url is', process.env.REACT_APP_SOCKET_URL);
 
     //When setting up the initial connection pass on the user name.
-    socket.current = io.connect('https://onechat-backend.herokuapp.com/', {
+    socket.current = io.connect(process.env.REACT_APP_SOCKET_URL, {
       query: `userName=${name}&avatarNumber=${avatarNumber}`
     });
 
@@ -118,13 +118,13 @@ function App({ history }) {
       setPartner(null);
     });
 
-    // Partner rejected your call.
+    // Partner rejected your call. Not disconnect.
     socket.current.on('rejectCallAcknowledgement', (data) => {
       setOutgoingCall(false);
       openSnackbar(`${data.name} rejected your call`);
     });
 
-    /* When someone is calling you this is run or you are being called by someone else. You get the signal of the other user which you must accept. You are not the initiator.
+    /* When someone is calling you this is run. You get the signal of the other user which you must accept. You are not the initiator.
       TODO: Refactor "hey" to a better name
     */
 
@@ -159,7 +159,8 @@ function App({ history }) {
         trickle: false,
         stream: stream
       });
-
+      
+      window.peer = peer;
       setPeer(peer);
 
       // This is the handshake that the other peer needs to accept.
@@ -182,6 +183,10 @@ function App({ history }) {
         resolve(true);
       });
 
+      peer.on('close', () => {
+        console.log('Initiator stream destroyed');
+      })
+
       // As soon as we receive a stream from the other user. Set it
       peer.on('stream', (partnerStream) => {
         if (partnerVideo.current) {
@@ -203,37 +208,52 @@ function App({ history }) {
     });
   }
 
+  const initializeReceiverPeer = () => {
+      // You are now some other peer (Not the initiator). You have your own stream that the other person must accept. Remember for Web RTC to work the person who initiated the call should also accept thee request.
+      const receiverPeer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream: stream
+      });
+
+      setPeer(receiverPeer);
+
+      // When you start generating a stream.
+      receiverPeer.on('signal', (data) => {
+        socket.current.emit('acceptCall', {
+          signal: data,
+          to: caller.id,
+          from: yourID
+        });
+      });
+
+      receiverPeer.on('stream', (stream) => {
+        partnerVideo.current.srcObject = stream;
+      });
+
+      ringAudio.current.pause();
+      ringAudio.current.currentTime = 0;
+
+      // Add a disconnect method.
+
+      receiverPeer.signal(callerSignal);
+  }
+
+  // When accept call is clicked on the UI by the receiver.
   function acceptCall() {
     setCallAccepted(true);
     setReceivingCall(false);
-    // You are now some other peer (Not the initiator). You have your own stream that the other person must accept. Remember for Web RTC to work the person who initiated the call should also accept thee request.
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: stream
-    });
 
-    setPeer(peer);
+    if (peer) {
+      peer.destroy();
 
-    // When you start generating a stream.
-    peer.on('signal', (data) => {
-      socket.current.emit('acceptCall', {
-        signal: data,
-        to: caller.id,
-        from: yourID
-      });
-    });
-
-    peer.on('stream', (stream) => {
-      partnerVideo.current.srcObject = stream;
-    });
-
-    ringAudio.current.pause();
-    ringAudio.current.currentTime = 0;
-
-    // Add a disconnect method.
-
-    peer.signal(callerSignal);
+      setTimeout(function () {
+        initializeReceiverPeer();
+      }, 2000);
+    } else {
+      initializeReceiverPeer();
+    }
+    
   }
 
   // TODO: Send some feedback to the person who called.
@@ -262,8 +282,9 @@ function App({ history }) {
         [yourID]: true
       }
     });
-    peer.destroy();
+    
     setPartner(null);
+    setTimeout(() => window.location.reload(), 1000);
   }
 
   // Function that changes the availability of users. (Busy/available)
@@ -335,10 +356,6 @@ function App({ history }) {
   const showPartnerVideo = callAccepted && partner && users[partner];
 
   const partnerDisconnected = callAccepted && partner && !users[partner];
-  if (partnerDisconnected) {
-    // TODO: Find a better way. Host Stream freezes.
-    window.location.reload();
-  }
   return (
     <Container>
       <Row className="video-section-wrapper">
@@ -362,7 +379,6 @@ function App({ history }) {
         )}
       </Row>
 
-      {partnerDisconnected && <h2>User Disconnected...</h2>}
 
       {showOutgoingCall()}
       {showUsersToCall()}
