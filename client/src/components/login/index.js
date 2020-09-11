@@ -36,7 +36,7 @@ export default function GetName({history}) {
     <div className="name-form-container">
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <input required type="text" autoFocus name="name" placeholder="Type your name and press enter" value={name} 
+          <input tabIndex="1" required type="text" autoFocus name="name" placeholder="Type your name and press enter" value={name} 
             onChange={handleChange}
           />
         </fieldset>
@@ -46,7 +46,7 @@ export default function GetName({history}) {
             Remember your name for subsequent logins?
           </label>
           <div className="checkbox-wrapper">
-            <input tabindex="2" ref={checkboxRef} type="checkbox" />
+            <input tabIndex="2" ref={checkboxRef} type="checkbox" />
             <span></span>
           </div>
           

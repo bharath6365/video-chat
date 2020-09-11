@@ -3,11 +3,7 @@ body {
 }
 .name-form-container {
   height: 100vh;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0, 0.85),
-    rgba(0,0,0, 0.65)
-  ),url(./images/phone.jpg);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.65)), url(./images/phone.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -35,26 +31,26 @@ fieldset {
   border: 0;
 }
 
-.checkbox-fieldset span{
-    width: 70px;
-    height: 35px;
-    border-radius: 20px;
-    display: inline-block;
-    background: rgb(145, 144, 144); 
-    position: relative;
+.checkbox-fieldset span {
+  width: 70px;
+  height: 35px;
+  border-radius: 20px;
+  display: inline-block;
+  background: rgb(145, 144, 144);
+  position: relative;
 }
 
-.checkbox-fieldset span::before{
+.checkbox-fieldset span::before {
   content: '';
-   position: absolute;
-   cursor: pointer;
-   top: 5px;
-   transform: translateX(10%);
-   width: 25px;
-   height: 25px;
-   border-radius: 50%;
-   background: black;
-   transition: transform 0.3s ease;
+  position: absolute;
+  cursor: pointer;
+  top: 5px;
+  transform: translateX(10%);
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: black;
+  transition: transform 0.3s ease;
 }
 
 .checkbox-wrapper {
@@ -65,22 +61,32 @@ fieldset {
   top: 10px;
 }
 
-.checkbox-fieldset input[type="checkbox"] {
-  width: 70px;
-  height: 35px;
-  position: absolute;
-  opacity: 0;
-  z-index: 10;
-  cursor: pointer;
-}
+.checkbox-fieldset {
+  input[type="checkbox"] {
+    width: 70px;
+    height: 35px;
+    position: absolute;
+    opacity: 0;
+    z-index: 10;
+    cursor: pointer;
+  }
 
-.checkbox-fieldset input:checked + span{
-  background:#595ac7a1;
-}
+  input:focus + span {
+    outline: 2px solid white;
+  }
+  input:checked + span {
+    background: #595ac7a1;
 
-.checkbox-fieldset input:checked + span::before{
-  transform: translateX(160%);
-  background: white;
+    &:active {
+      border: 1px solid red;
+    }
+
+    &:before {
+      transform: translateX(160%);
+      background: white;
+    }
+  }
+
 }
 
 /* Button styles */
@@ -121,7 +127,7 @@ section {
   User List Related
 */
 
-.user-list h1{
+.user-list h1 {
   color: black;
   margin-bottom: 40px;
   font-size: 3.75rem;
@@ -132,26 +138,26 @@ section {
   background-clip: text;
 }
 
-.user-list h6{
+.user-list h6 {
   display: inline-block;
   font-size: 1.25rem;
   padding-right: 20px;
   color: #fff;
 }
 
-li{
-   list-style: none;
+li {
+  list-style: none;
 }
-li:before{
-   content: '';
-   display: inline-block;
-   height: 45px;
-   width: 45px;
-   position: relative;
-   top: 10px;
-   background-image: url('./images/user-icon.png');
-   background-size: cover;
-   background-position: center;
+li:before {
+  content: '';
+  display: inline-block;
+  height: 45px;
+  width: 45px;
+  position: relative;
+  top: 10px;
+  background-image: url('./images/user-icon.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .video-section-wrapper {
@@ -171,7 +177,7 @@ li:before{
     position: absolute;
     bottom: 30px;
     right: 15vw;
-    
+
     video {
       border-radius: 50%;
     }
@@ -187,7 +193,6 @@ li:before{
     background: none;
   }
 }
-
 
 /* Call cute behaviour*/
 .call-cut {
@@ -231,10 +236,69 @@ li:before{
       transform: skew(0deg);
     }
   }
-
 }
 
-@media(max-width: 960px) {
+.container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+}
+
+.video-wrapper {
+  width: 50%;
+  height: 400px;
+  position: relative;
+}
+
+video {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+nav {
+  background: black;
+  color: #fff;
+  padding: 10px 10vw;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    font-family: 'Kavoon', cursive;
+    font-size: 2rem;
+  }
+
+  img {
+    height: 75px;
+  }
+
+  h4 {
+    cursor: pointer;
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  &.sticky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    width: 100%;
+  }
+}
+
+@media (max-width: 960px) {
   .video-section-wrapper {
     .partner-video-wrapper {
       width: 100vw;
@@ -248,9 +312,13 @@ li:before{
       right: 10px;
     }
   }
+
+  .video-wrapper {
+    width: 100%;
+  }
 }
 
-@media(max-width: 600px) {
+@media (max-width: 600px) {
   .name-form-container input[type="text"] {
     width: 100%;
     font-size: 1.45rem;
@@ -261,7 +329,8 @@ li:before{
       font-size: 0.625rem;
     }
 
-    input[type="checkbox"], span {
+    input[type="checkbox"],
+    span {
       width: 50px;
       height: 25px;
     }
@@ -273,4 +342,3 @@ li:before{
     }
   }
 }
-

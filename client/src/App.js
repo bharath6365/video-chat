@@ -1,45 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 import './App.scss';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import styled from 'styled-components';
 import { useSnackbar } from 'react-simple-snackbar';
 
 import { snackBarOptions } from './utils';
 import UserList from './components/UserList';
 import CallCut from './images/call-cut.png';
+import useUserMedia from './effects/user-media';
+import CallReceiving from './components/CallReceiving';
+import CallOutGoing from './components/CallOutGoing';
 
-const Container = styled.div`
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Row = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
-const VideoWrapper = styled.div`
-  width: 50%;
-  height: 400px;
-  position: relative;
-
-  @media (max-width: 960px) {
-    width: 100%;
-  }
-`;
-
-const Video = styled.video`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-`;
 
 function App({ history }) {
   const name = localStorage.getItem('name') || sessionStorage.getItem('name');
@@ -54,8 +25,6 @@ function App({ history }) {
   // List of all the users retreived from the backend.
   const [ users, setUsers ] = useState({});
 
-  // Stream from our audio and video.
-  const [ stream, setStream ] = useState();
 
   // Call Received from some other user.
   const [ receivingCall, setReceivingCall ] = useState(false);
@@ -78,32 +47,28 @@ function App({ history }) {
 
   const [ openSnackbar, closeSnackbar ] = useSnackbar(snackBarOptions);
 
+  let [disconnectCount, setDisconnectCount] = useState(0);
+
   const userVideo = useRef();
   const partnerVideo = useRef();
   const socket = useRef();
   const ringAudio = useRef();
+  const stream = useUserMedia();
 
   useEffect(() => {
-    // In Development. This is forwarded to the backend by create react app.
-    console.log('Socket url is', process.env.REACT_APP_SOCKET_URL);
+    if (userVideo.current) {
+      userVideo.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  useEffect(() => {
+    // In Development. This is forwarded to the backend by create reac
 
     //When setting up the initial connection pass on the user name.
     socket.current = io.connect(process.env.REACT_APP_SOCKET_URL, {
       query: `userName=${name}&avatarNumber=${avatarNumber}`
     });
 
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        // Loads our Video.
-        setStream(stream);
-        if (userVideo.current) {
-          userVideo.current.srcObject = stream;
-        }
-      })
-      .catch(() => {
-        alert('This application needs webcam and microphone access to work. Do not worry about your privacy.');
-      });
 
     // Computed by the backend.
     socket.current.on('yourID', (id) => {
@@ -142,7 +107,13 @@ function App({ history }) {
       // Ringtone
       ringAudio.current.play();
     });
-  }, []);
+    
+    // Unmount
+    return () => {
+      console.log('Unmount');
+      socket.current.destroy();
+    }
+  }, [disconnectCount]);
 
   function callPeer(peerID, stream) {
     // Promise because we will have to disabl load button.
@@ -160,7 +131,6 @@ function App({ history }) {
         stream: stream
       });
       
-      window.peer = peer;
       setPeer(peer);
 
       // This is the handshake that the other peer needs to accept.
@@ -183,10 +153,6 @@ function App({ history }) {
         resolve(true);
       });
 
-      peer.on('close', () => {
-        console.log('Initiator stream destroyed');
-      })
-
       // As soon as we receive a stream from the other user. Set it
       peer.on('stream', (partnerStream) => {
         if (partnerVideo.current) {
@@ -208,7 +174,7 @@ function App({ history }) {
     });
   }
 
-  const initializeReceiverPeer = () => {
+  function initializeReceiverPeer() {
       // You are now some other peer (Not the initiator). You have your own stream that the other person must accept. Remember for Web RTC to work the person who initiated the call should also accept thee request.
       const receiverPeer = new Peer({
         initiator: false,
@@ -256,6 +222,10 @@ function App({ history }) {
     
   }
 
+  function resetPartner() {
+    setPartner(null);
+  }
+
   // TODO: Send some feedback to the person who called.
   function rejectCall() {
     setReceivingCall(false);
@@ -264,6 +234,7 @@ function App({ history }) {
       id: caller.id,
       name
     });
+    resetPartner();
     // Reset Call Audio.
     ringAudio.current.pause();
     ringAudio.current.currentTime = 0;
@@ -275,16 +246,11 @@ function App({ history }) {
     socket.current.emit('disconnectCall', caller);
     // Update the list of users. Mark them as available.
     // Signal to the Server to update the User List.
-    socket.current.emit('updateUsers', {
-      available: true,
-      users: {
-        [partner]: true,
-        [yourID]: true
-      }
-    });
+    changeUserAvailability(partner, yourID, true);
     
-    setPartner(null);
-    setTimeout(() => window.location.reload(), 1000);
+    resetPartner();
+    //setTimeout(() => window.location.reload(), 1000);
+    setTimeout(() => setDisconnectCount(++disconnectCount), 1000);
   }
 
   // Function that changes the availability of users. (Busy/available)
@@ -303,12 +269,7 @@ function App({ history }) {
     if (!outgoingCall) return null;
 
     return (
-      <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
-        <Header icon="call" content="Calling the user..." />
-        <Modal.Content>
-          <p>Hang on tight.</p>
-        </Modal.Content>
-      </Modal>
+      <CallOutGoing />
     );
   }
 
@@ -320,30 +281,15 @@ function App({ history }) {
 
   let UserVideo;
   if (stream) {
-    UserVideo = <Video playsInline muted ref={userVideo} autoPlay />;
+    UserVideo = <video playsInline muted ref={userVideo} autoPlay />;
   }
 
   let incomingCall;
 
-  // TODO: Move it to a separate component.
   // Triggered by the listening to the hey event sent by the server.
   if (receivingCall) {
-    const header = `${caller.name} is calling you`;
     incomingCall = (
-      <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
-        <Header icon="call" content={header} />
-        <Modal.Content>
-          <p>Would you like to accept the call?</p>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button onClick={rejectCall} basic color="red" inverted>
-            <Icon name="remove" /> No
-          </Button>
-          <Button onClick={acceptCall} color="green" inverted>
-            <Icon name="checkmark" /> Yes
-          </Button>
-        </Modal.Actions>
-      </Modal>
+      <CallReceiving caller={caller} acceptCall={acceptCall} rejectCall={rejectCall} />
     );
   }
 
@@ -357,37 +303,38 @@ function App({ history }) {
 
   const partnerDisconnected = callAccepted && partner && !users[partner];
   return (
-    <Container>
-      <Row className="video-section-wrapper">
+    <div className="container">
+      <div className="row video-section-wrapper">
         {/* Different styling when host video is*/}
         {
-          <VideoWrapper
+          <div c
             className={`
+                video-wrapper
                 host-video-wrapper
                 ${showPartnerVideo ? 'connected' : ''}
               `}
           >
             {UserVideo}
-          </VideoWrapper>
+          </div>
         }
 
         {showPartnerVideo && (
-          <VideoWrapper className="partner-video-wrapper">
-            <Video playsInline ref={partnerVideo} autoPlay />
+          <div className="video-wrapper partner-video-wrapper">
+            <video playsInline ref={partnerVideo} autoPlay />
             <img onClick={() => disconnectCall()} className="call-cut" src={CallCut} />
-          </VideoWrapper>
+          </div>
         )}
-      </Row>
+      </div>
 
 
       {showOutgoingCall()}
       {showUsersToCall()}
-      <Row>{incomingCall}</Row>
+      <div className="row">{incomingCall}</div>
 
       <audio ref={ringAudio} loop>
         <source src="/audio/dialtone.mp3" />
       </audio>
-    </Container>
+    </div>
   );
 }
 export default App;

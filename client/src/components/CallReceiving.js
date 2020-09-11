@@ -1,13 +1,24 @@
 // Used to show the Call Accepting Screen
 import React from 'react'
+import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 
 
-export default function CallReceiving({receivingCall, name, acceptCall, rejectCall}) {
-  if (!receivingCall) return null;
+export default function CallReceiving({caller, rejectCall, acceptCall}) {
+  const header = `${caller.name} is calling you`;
   return (
-    <div>
-      <h1>{name} is calling you</h1>
-      <button onClick={acceptCall}>Accept</button>
-    </div>
+    <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
+      <Header icon="call" content={header} />
+      <Modal.Content>
+        <p>Would you like to accept the call?</p>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={rejectCall} basic color="red" inverted>
+          <Icon name="remove" /> No
+        </Button>
+        <Button onClick={acceptCall} color="green" inverted>
+          <Icon name="checkmark" /> Yes
+        </Button>
+      </Modal.Actions>
+    </Modal>
   )
 }
