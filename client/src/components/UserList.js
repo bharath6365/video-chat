@@ -4,6 +4,7 @@ import { Button, Card, Image } from 'semantic-ui-react';
 import NotFound from './NotFound';
 
 export default function UserList({ users, yourID, handleClick, yourStream }) {
+  console.log('My Stream is', yourStream);
 
   const [buttonLoading, setButtonLoading] = useState(false)
 
@@ -58,7 +59,7 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
         </Card.Group>
       )}
 
-      {usersOnline <= 1 && <NotFound />}
+      {usersOnline <= 1 && <NotFound myStream={yourStream} />}
     </section>
   );
 }

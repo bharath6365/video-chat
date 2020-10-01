@@ -62,7 +62,7 @@ function App({ history }) {
   }, [stream]);
 
   useEffect(() => {
-    // In Development. This is forwarded to the backend by create reac
+    if (!userVideo.current) return;
 
     //When setting up the initial connection pass on the user name.
     socket.current = io.connect(process.env.REACT_APP_SOCKET_URL, {
@@ -113,7 +113,7 @@ function App({ history }) {
       console.log('Unmount');
       socket.current.destroy();
     }
-  }, [disconnectCount]);
+  }, [disconnectCount, stream]);
 
   function callPeer(peerID, stream) {
     // Promise because we will have to disabl load button.

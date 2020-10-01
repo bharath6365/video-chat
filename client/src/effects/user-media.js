@@ -14,7 +14,10 @@ const useUserMedia = () => {
         const userStream = await navigator.mediaDevices.getUserMedia(constraints);
         setStream(userStream);
       } catch (e) {
-        console.error(e);
+        if (e.t0 && e.t0.name === 'NotFoundError') {
+          window.location.href = '/no-support';
+        }
+        console.error(e.message);
         alert('This application needs webcam and microphone access to work. Do not worry about your privacy.');
       }
     };

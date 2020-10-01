@@ -7,6 +7,7 @@ import App from './App';
 import Nav from './components/nav';
 import * as serviceWorker from './serviceWorker';
 import GetName from './components/login';
+import NoSupport from './components/login/NoSupport';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,6 +16,7 @@ ReactDOM.render(
         <Nav />
         <Route path="/" exact component={GetName} />
         <Route path="/chat" exact component={App} />
+        <Route path="/no-support" exact component={NoSupport} />
       </SnackbarProvider>
     </Router>
   </React.StrictMode>,
