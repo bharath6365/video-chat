@@ -110,13 +110,12 @@ function App({ history }) {
     
     // Unmount
     return () => {
-      console.log('Unmount');
       socket.current.destroy();
     }
   }, [disconnectCount, stream]);
 
   function callPeer(peerID, stream) {
-    // Promise because we will have to disabl load button.
+    // Promise because we will have to disable load button.
     return new Promise((resolve, reject) => {
       /* 
     Whenever we want to call a peer first we need to send a signal to someone that
