@@ -1,6 +1,6 @@
 [build]
   # Directory to publish (output of the build command, relative to the base of the project)
-  publish = "client/build"
+  publish = "build"
   
   # Base directory to change to before starting the build
   base = "client/"
