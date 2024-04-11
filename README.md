@@ -16,5 +16,5 @@ This project is a real-time video chat application that utilizes Socket.IO for t
 
 4. Call Management: Users can accept, reject, or end calls. The server updates the user list accordingly.
 
-![Socket.io](client/socket.png)
+![Socket.io](client/src/socket.png)
 
