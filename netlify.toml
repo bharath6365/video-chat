@@ -6,7 +6,7 @@
   base = "client/"
   
   # Build command to run
-  command = "npm install && npm run build"
+  command = "CI=false npm install && CI=false npm run build"
 
   # Environment variables specific to the build context
   [build.environment]
