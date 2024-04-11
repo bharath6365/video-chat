@@ -9,7 +9,7 @@ app.options('*', cors())
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000", // Allow only this origin to connect
+    origin: ["http://localhost:3000", "https://onechat.netlify.app"], // Allow only this origin to connect
     methods: ["GET", "POST"], // Allowable methods
     allowedHeaders: ["my-custom-header"], // Custom headers you might use
     credentials: true // Allow cookies and other credentials
