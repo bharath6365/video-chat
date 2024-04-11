@@ -4,7 +4,6 @@ import { Button, Card, Image } from 'semantic-ui-react';
 import NotFound from './NotFound';
 
 export default function UserList({ users, yourID, handleClick, yourStream }) {
-  console.log('My Stream is', yourStream);
 
   const [buttonLoading, setButtonLoading] = useState(false)
 
@@ -25,7 +24,7 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
         <Card.Group>
           {Object.keys(users).map((key) => {
             const random = Math.random() * (100 - 0);
-            const userName = users[key].name;
+            const userName = users[key].userName;
             const available = users[key].available;
             // You dont want to call yourself for heaven sake.
             if (key === yourID || userName === null) {
@@ -33,8 +32,7 @@ export default function UserList({ users, yourID, handleClick, yourStream }) {
             }
 
             // There are 12 random avatar's available. On Every render assign a random avatar.
-            const avatarID = users[key].avatarNumber;
-            return (
+            const avatarID = users[key].avatarNumber;            return (
               <Card>
                 <Card.Content>
                   <Image floated="right" size="mini" src={`https://randomuser.me/api/portraits/lego/${avatarID}.jpg`} />

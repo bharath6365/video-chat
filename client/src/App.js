@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './App.scss';
+import './App.css';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useSnackbar } from 'react-simple-snackbar';
@@ -94,13 +94,15 @@ function App({ history }) {
     */
 
     socket.current.on('hey', (data) => {
+      console.log('Data', data);
       // Will tell the user that someone's calling.
       setReceivingCall(true);
       // Set the caller to be displayed.
       setCaller({
         id: data.from,
-        name: data.name
+        userName: data.userName
       });
+      console.log('Data', data);
       setCallerSignal(data.signal);
       setPartner(data.from);
 
@@ -127,7 +129,8 @@ function App({ history }) {
         // I'm initiating the call
         initiator: true,
         trickle: false,
-        stream: stream
+        stream: stream,
+        config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
       });
       
       setPeer(peer);
@@ -185,6 +188,7 @@ function App({ history }) {
 
       // When you start generating a stream.
       receiverPeer.on('signal', (data) => {
+        console.log('Data', data)
         socket.current.emit('acceptCall', {
           signal: data,
           to: caller.id,

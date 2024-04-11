@@ -4,7 +4,8 @@ import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 
 
 export default function CallReceiving({caller, rejectCall, acceptCall}) {
-  const header = `${caller.name} is calling you`;
+  console.log('Caller', caller);
+  const header = `${caller.userName} is calling you`;
   return (
     <Modal defaultOpen={true} closeOnDimmerClick={false} closeOnDocumentClick={false} basic size="small">
       <Header icon="call" content={header} />

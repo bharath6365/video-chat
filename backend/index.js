@@ -1,10 +1,20 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors');
 
 const app = express();
+
+app.options('*', cors())
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Allow only this origin to connect
+    methods: ["GET", "POST"], // Allowable methods
+    allowedHeaders: ["my-custom-header"], // Custom headers you might use
+    credentials: true // Allow cookies and other credentials
+  }
+});
 
 // Store users with their socket IDs and availability
 let users = {};
@@ -30,19 +40,22 @@ const setUserAvailability = (userId, available) => {
 };
 
 io.on('connection', (socket) => {
-  socket.on('join', ({ userName, avatarNumber }) => {
-    const userId = socket.id;
-    addUser(userId, socket.id, userName, avatarNumber);
-    socket.emit('yourID', userId);
-    io.sockets.emit('allUsers', users);
-  });
+  const { userName, avatarNumber } = socket.handshake.query;
+  console.log('A user connected with userName:', userName, 'and avatarNumber:', avatarNumber);
+  const userId = socket.id;
+  addUser(userId, socket.id, userName, avatarNumber);
+  socket.emit('yourID', userId);
+  io.sockets.emit('allUsers', users);
+
 
   socket.on('callUser', ({ userIdToCall, signalData, from }) => {
     setUserAvailability(from, false);
     setUserAvailability(userIdToCall, false);
+    const userToCall = users[userIdToCall];
     io.to(userIdToCall).emit('hey', {
       signal: signalData,
       from,
+      userName: userToCall.userName
     });
     io.sockets.emit('allUsers', users);
   });

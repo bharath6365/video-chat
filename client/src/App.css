@@ -12,7 +12,6 @@ body {
   align-items: center;
   color: white;
 }
-
 .name-form-container input[type="text"] {
   min-width: 40vw;
   background: transparent;
@@ -22,24 +21,20 @@ body {
   font-size: 2rem;
   color: #fff;
 }
-
 .name-form-container input[type="text"]:focus {
   outline: 0;
 }
-
 fieldset {
   border: 0;
 }
-
 .checkbox-fieldset span {
   width: 70px;
   height: 35px;
   border-radius: 20px;
   display: inline-block;
-  background: rgb(145, 144, 144);
+  background: #919090;
   position: relative;
 }
-
 .checkbox-fieldset span::before {
   content: '';
   position: absolute;
@@ -52,7 +47,6 @@ fieldset {
   background: black;
   transition: transform 0.3s ease;
 }
-
 .checkbox-wrapper {
   display: inline-block;
   position: relative;
@@ -60,35 +54,27 @@ fieldset {
   position: relative;
   top: 10px;
 }
-
-.checkbox-fieldset {
-  input[type="checkbox"] {
-    width: 70px;
-    height: 35px;
-    position: absolute;
-    opacity: 0;
-    z-index: 10;
-    cursor: pointer;
-  }
-
-  input:focus + span {
-    outline: 2px solid white;
-  }
-  input:checked + span {
-    background: #595ac7a1;
-
-    &:active {
-      border: 1px solid red;
-    }
-
-    &:before {
-      transform: translateX(160%);
-      background: white;
-    }
-  }
-
+.checkbox-fieldset input[type="checkbox"] {
+  width: 70px;
+  height: 35px;
+  position: absolute;
+  opacity: 0;
+  z-index: 10;
+  cursor: pointer;
 }
-
+.checkbox-fieldset input:focus + span {
+  outline: 2px solid white;
+}
+.checkbox-fieldset input:checked + span {
+  background: #595ac7 a1;
+}
+.checkbox-fieldset input:checked + span:active {
+  border: 1px solid red;
+}
+.checkbox-fieldset input:checked + span:before {
+  transform: translateX(160%);
+  background: white;
+}
 /* Button styles */
 button {
   padding: 10px 25px;
@@ -98,35 +84,25 @@ button {
   cursor: pointer;
   color: white;
 }
-
 button::active {
   outline: 0;
 }
-
 button + button {
   margin-left: 25px;
 }
-
 button.primary {
   background: green;
 }
-
 button.secondary {
   background: tomato;
 }
-
 section {
   padding: 50px 25px;
 }
-
 .align-center {
   text-align: center;
 }
-
-/*
-  User List Related
-*/
-
+/* User List Related */
 .user-list h1 {
   color: black;
   margin-bottom: 40px;
@@ -137,14 +113,12 @@ section {
   color: transparent;
   background-clip: text;
 }
-
 .user-list h6 {
   display: inline-block;
   font-size: 1.25rem;
   padding-right: 20px;
   color: #fff;
 }
-
 li {
   list-style: none;
 }
@@ -159,41 +133,34 @@ li:before {
   background-size: cover;
   background-position: center;
 }
-
 .video-section-wrapper {
   position: relative;
   background: black;
 }
-
 .host-video-wrapper {
-  transition: clip-path .5s ease;
+  transition: clip-path 0.5s ease;
   z-index: 250;
   margin: auto;
-  &.connected {
-    width: 200px;
-    height: 200px;
-    background-size: cover;
-    background-position: center;
-    position: absolute;
-    bottom: 30px;
-    right: 15vw;
-
-    video {
-      border-radius: 50%;
-    }
-  }
 }
-
-.video-section-wrapper {
-  .partner-video-wrapper {
-    width: 70vw;
-    height: 600px;
-    margin: 0 auto;
-    z-index: 200;
-    background: none;
-  }
+.host-video-wrapper.connected {
+  width: 200px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  bottom: 30px;
+  right: 15vw;
 }
-
+.host-video-wrapper.connected video {
+  border-radius: 50%;
+}
+.video-section-wrapper .partner-video-wrapper {
+  width: 70vw;
+  height: 600px;
+  margin: 0 auto;
+  z-index: 200;
+  background: none;
+}
 /* Call cute behaviour*/
 .call-cut {
   position: absolute;
@@ -205,57 +172,48 @@ li:before {
   height: 50px;
   cursor: pointer;
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-
-  &:hover {
-    opacity: 1;
-    transform: translateX(-50%) rotateZ(120deg);
-  }
 }
-
-// 404 styling
+.call-cut:hover {
+  opacity: 1;
+  transform: translateX(-50%) rotateZ(120deg);
+}
 .not-found {
   margin: 30px auto;
   text-align: center;
   max-width: 860px;
-
-  p {
-    font-size: 1.5rem;
-  }
-
-  button {
-    padding: 5px 10px;
-    outline: none;
-    border: 0;
-    background: transparent;
-    /* color: black; */
-    background: #50438d;
-    transform: skew(-10deg, 10deg);
-    transition: transform 0.3s ease;
-
-    &:hover {
-      transform: skew(0deg);
-    }
-  }
 }
-
+.not-found p {
+  font-size: 1.5rem;
+}
+.not-found button {
+  padding: 5px 10px;
+  outline: none;
+  border: 0;
+  background: transparent;
+ /* color: black;
+  */
+  background: #50438d;
+  transform: skew(-10deg, 10deg);
+  transition: transform 0.3s ease;
+}
+.not-found button:hover {
+  transform: skew(0deg);
+}
 .container {
   height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
 }
-
 .row {
   display: flex;
   width: 100%;
 }
-
 .video-wrapper {
   width: 50%;
   height: 400px;
   position: relative;
 }
-
 video {
   position: absolute;
   right: 0;
@@ -264,7 +222,6 @@ video {
   width: 100%;
   object-fit: cover;
 }
-
 nav {
   background: black;
   color: #fff;
@@ -273,72 +230,56 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  h2 {
-    font-family: 'Kavoon', cursive;
-    font-size: 2rem;
-  }
-
-  img {
-    height: 75px;
-  }
-
-  h4 {
-    cursor: pointer;
-    font-size: 1.25rem;
-    margin: 0;
-  }
-
-  &.sticky {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: transparent;
-    width: 100%;
-  }
 }
-
+nav h2 {
+  font-family: 'Kavoon', cursive;
+  font-size: 2rem;
+}
+nav img {
+  height: 75px;
+}
+nav h4 {
+  cursor: pointer;
+  font-size: 1.25rem;
+  margin: 0;
+}
+nav.sticky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  width: 100%;
+}
 @media (max-width: 960px) {
-  .video-section-wrapper {
-    .partner-video-wrapper {
-      width: 100vw;
-      height: 80vh;
-    }
-
-    .host-video-wrapper.connected {
-      width: 100px;
-      height: 100px;
-      bottom: 10px;
-      right: 10px;
-    }
-  }
-
+  .video-section-wrapper .partner-video-wrapper {
+    width: 100vw;
+    height: 80vh;
+ }
+  .video-section-wrapper .host-video-wrapper.connected {
+    width: 100px;
+    height: 100px;
+    bottom: 10px;
+    right: 10px;
+ }
   .video-wrapper {
     width: 100%;
-  }
+ }
 }
-
 @media (max-width: 600px) {
   .name-form-container input[type="text"] {
     width: 100%;
     font-size: 1.45rem;
-  }
-
-  .checkbox-fieldset {
-    label {
-      font-size: 0.625rem;
-    }
-
-    input[type="checkbox"],
-    span {
-      width: 50px;
-      height: 25px;
-    }
-
-    span::before {
-      width: 15px;
-      height: 15px;
-      left: 5px;
-    }
-  }
+ }
+  .checkbox-fieldset label {
+    font-size: 0.625rem;
+ }
+  .checkbox-fieldset input[type="checkbox"], .checkbox-fieldset span {
+    width: 50px;
+    height: 25px;
+ }
+  .checkbox-fieldset span::before {
+    width: 15px;
+    height: 15px;
+    left: 5px;
+ }
 }
